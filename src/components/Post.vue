@@ -1,8 +1,9 @@
 <template lang="html">
   <div class="post-wrapper" :style="globalStyle">
+    <loading :isloading="isloading"></loading>
     <div class="post" @touchstart="touchStart" @touchmove.prevent="touchMove"
           @touchend="touchEnd"  @transitionend="transitionEnd" :style="style" >
-      <post-item v-for="option in options.children" :options="option" :style="{height: clientHeight+'px'}"></post-item>
+      <post-item v-for="(option,index) in options.children" :key="index" :index="index" :currentPage="currentPage" :options="option" :style="{height: clientHeight+'px'}"></post-item>
     </div>
     <div class="music" v-if="options.audio" :class="{stopped: stopped}">
       <audio  id="music-audio" :src="options.audio.src" loop autoplay="autoplay" preload="auto"></audio>
@@ -16,8 +17,9 @@
 
 <script>
 import PostItem from './PostItem'
+import Loading from './Loading.vue'
 const dragthreshold = 0.5
-let beginY = 0,tempTop = 0,tempPage = 0,isAnimating = false
+let beginY = 0,tempTop = 0,tempPage = 0,timestamp = 0,isAnimating = false
 export default {
   props: [
     'options'
@@ -37,7 +39,9 @@ export default {
         transiton: false
       },
       backgroundImageUrl: this.options.backgroundImage,
-      stopped: false
+      stopped: false,
+      isloading: true,
+      currentPage: -1
     }
   },
   computed: {
@@ -54,18 +58,20 @@ export default {
     }
   },
   components: {
-    'post-item': PostItem
+    'post-item': PostItem,
+    'loading': Loading
   },
   methods: {
     touchStart: function (e) {
       if (!isAnimating) {
         beginY = e.touches[0].clientY
+        timestamp = e.timeStamp
       }
     },
     touchMove: function (e) {
       if (!isAnimating) {
         let movedY = e.changedTouches[0].clientY - beginY
-        if ((tempPage === 0 && movedY > 0)||((tempPage === this.options.children.length - 1) && movedY < 0)) return
+        if ((tempPage === 0 && movedY > 0)||((tempPage === this.options.children.length - 1) && movedY < 0||Math.abs(movedY)<100)) return
         if (Math.ceil(Math.abs(movedY) / window.innerHeight * 100) < dragthreshold * 100) {
           this.style.transform = 'translate3d(0,'+(tempTop + movedY)+'px,0)'
         }
@@ -74,7 +80,7 @@ export default {
     touchEnd: function (e) {
       if (!isAnimating) {
         let movedY = e.changedTouches[0].clientY - beginY
-        if ((tempPage === 0 && movedY > 0)||((tempPage === this.options.children.length - 1) && movedY < 0)) return
+        if ((tempPage === 0 && movedY > 0)||((tempPage === this.options.children.length - 1) && movedY < 0)||Math.abs(movedY)<100) return
         this.style.transition = 'all '+this.options.animateDuration+'s'
         let percentage = parseFloat(movedY / this.clientHeight)
         if(percentage*100 > 20){
@@ -90,6 +96,7 @@ export default {
     },
     transitionEnd: function (e) {
       this.style.transition = 'none'
+      this.currentPage = tempPage
       isAnimating = false
     },
     handleControl: function (e) {
@@ -97,7 +104,10 @@ export default {
     }
   },
   mounted: function () {
-
+    setTimeout(()=>{
+      this.isloading = false;
+      this.currentPage = 0;
+    },0)
   }
 }
 

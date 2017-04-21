@@ -1,9 +1,0 @@
-//"out": "rotate.css"
-.loop-rotate(@index) when (@index =< 100){
-  @{index} {transform: rotate(unit(@index*360)/100deg);}
-  .loop-rotate(@index + 10)
-}
-
-@keyframes rotate2d {
-  .loop-rotate(10%)
-}
