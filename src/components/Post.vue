@@ -71,7 +71,7 @@ export default {
     touchMove: function (e) {
       if (!isAnimating) {
         let movedY = e.changedTouches[0].clientY - beginY
-        if ((tempPage === 0 && movedY > 0)||((tempPage === this.options.children.length - 1) && movedY < 0||Math.abs(movedY)<100)) return
+        if ((tempPage === 0 && movedY > 0)||((tempPage === this.options.children.length - 1) && movedY < 0)) return
         if (Math.ceil(Math.abs(movedY) / window.innerHeight * 100) < dragthreshold * 100) {
           this.style.transform = 'translate3d(0,'+(tempTop + movedY)+'px,0)'
         }
@@ -80,8 +80,7 @@ export default {
     touchEnd: function (e) {
       if (!isAnimating) {
         let movedY = e.changedTouches[0].clientY - beginY
-        if ((tempPage === 0 && movedY > 0)||((tempPage === this.options.children.length - 1) && movedY < 0)||Math.abs(movedY)<100) return
-        this.style.transition = 'all '+this.options.animateDuration+'s'
+        if ((tempPage === 0 && movedY > 0)||((tempPage === this.options.children.length - 1) && movedY < 0)) return
         let percentage = parseFloat(movedY / this.clientHeight)
         if(percentage*100 > 20){
           tempPage--
@@ -90,8 +89,12 @@ export default {
             tempPage++
             tempTop -= this.clientHeight
         }
-        this.style.transform = 'translate3d(0,'+tempTop+'px,0)'
-        isAnimating = true
+        if(Math.abs(movedY) > 0){
+          this.style.transition = 'all '+this.options.animateDuration+'s'
+          this.style.transform = 'translate3d(0,'+tempTop+'px,0)'
+          isAnimating = true
+        }
+
       }
     },
     transitionEnd: function (e) {
