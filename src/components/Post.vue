@@ -12,12 +12,20 @@
         </div>
       </div>
     </div>
+    <vodal :show="show" animation="zoom" @hide="show = false" :width="4" :height="2" measure="rem">
+        <div class="header">提示</div>
+        <div class="body">A vue modal with animations.</div>
+        <button class="vodal-confirm-btn">确认信息无误</button>
+        <button class="vodal-cancel-btn">再回去看看</button>
+    </vodal>
   </div>
 </template>
-
 <script>
 import PostItem from './PostItem'
 import Loading from './Loading.vue'
+import Vodal from 'vodal'
+import "vodal/common.css"
+import "vodal/zoom.css"
 const dragthreshold = 0.5
 let beginY = 0,tempTop = 0,tempPage = 0,timestamp = 0,isAnimating = false
 export default {
@@ -29,7 +37,8 @@ export default {
       clientHeight: window.innerHeight,
       style: {
         transform: '',
-        transition: ''
+        transition: '',
+        width: window.pageWidth + 'px'
       },
       globalStyle: {
         backgroundColor: this.options.backgroundColor,
@@ -41,7 +50,8 @@ export default {
       backgroundImageUrl: this.options.backgroundImage,
       stopped: false,
       isloading: true,
-      currentPage: -1
+      currentPage: -1,
+      show: false
     }
   },
   computed: {
@@ -59,7 +69,8 @@ export default {
   },
   components: {
     'post-item': PostItem,
-    'loading': Loading
+    'loading': Loading,
+    Vodal
   },
   methods: {
     touchStart: function (e) {
@@ -93,6 +104,9 @@ export default {
           this.style.transition = 'all '+this.options.animateDuration+'s'
           this.style.transform = 'translate3d(0,'+tempTop+'px,0)'
           isAnimating = true
+          setTimeout(function () {
+            isAnimating = false
+          },this.options.animateDuration * 1000)
         }
 
       }
@@ -107,10 +121,40 @@ export default {
     }
   },
   mounted: function () {
-    setTimeout(()=>{
+
       this.isloading = false;
       this.currentPage = 0;
-    },0)
+
+
+    // var firstTouch = true;
+    // document.body.addEventListener("touchstart",function(e){
+    //     if ( firstTouch ) {
+    //     firstTouch = false;
+    //     document.getElementById('music-audio').play();
+    //     }else{
+    //     return;
+    //     }
+    // });
+    // let music = document.getElementsByClassName('music')[0];
+    // let offsetRight = music.offsetParent.offsetWidth - music.offsetLeft - music.offsetWidth
+    // console.log(offsetRight);
+    // let right = (document.documentElement.clientWidth - pageWidth) / 2 + offsetRight
+    // music.style.right = right + 'px'
+    // var ua = navigator.userAgent;
+    // if(/iPhone/i.test(ua)){
+    //   this.stopped = true
+
+    //}
+    document.addEventListener('DOMContentLoaded', function () {
+        function audioAutoPlay() {
+            var audio = document.getElementById('music-audio');
+                audio.play();
+            document.addEventListener("WeixinJSBridgeReady", function () {
+                audio.play();
+            }, false);
+        }
+        audioAutoPlay();
+    });
   }
 }
 
@@ -136,6 +180,14 @@ html,body,.post-wrapper {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+body {
+  font-size: 16px;
+}
+ul,li,a,button,menu,dir {
+  margin: 0;
+  padding: 0;
 }
 .post-wrapper {
   position: relative;
@@ -144,20 +196,21 @@ html,body,.post-wrapper {
 }
 .post {
   width: 100%;
+  margin: 0 auto;
   position: relative;
 }
 .music {
   position: absolute;
-  top: .1rem;
-  right: 1.5rem;
-  width: 2rem;
-  height: 2rem;
+  top: .02133333rem;
+  right: .32rem;
+  width: .42666667rem;
+  height: .42666667rem;
   z-index: 100;
 }
 
 .music .control{
-  width: 3.5rem;
-  height: 3.5rem;
+  width: .74666667rem;
+  height: .74666667rem;
   background: url('../assets/music.gif') transparent no-repeat center center;
   background-size: contain;
 }
@@ -165,8 +218,8 @@ html,body,.post-wrapper {
   position: absolute;
   top: 50%;
   left: 20%;
-  width: 2rem;
-  height: 2rem;
+  width: .42666667rem;
+  height: .42666667rem;
   background: url('../assets/music_off.png') transparent no-repeat center center;
   background-size: 100% 100%;
   animation-name: rotate2d;
@@ -181,11 +234,55 @@ html,body,.post-wrapper {
 .music.stopped .control-btn {
   animation: none;
 }
+.vodal-dialog .header {
+  font-size: .213rem;
+  padding-bottom: .133rem;
+  border-bottom: 1px solid #e9e9e9;
+}
+.vodal-cancel-btn, .vodal-confirm-btn {
+    position: absolute;
+    font: inherit;
+    bottom: .213rem;
+    padding: .053rem .2rem;
+    border-radius: 3px;
+    transition: background .2s;
+    border: 1px solid #03a9f4;
+}
+.vodal-confirm-btn {
+    color: #fff;
+    right: 1.733rem;
+    background: #03a9f4;
+}
+.vodal-cancel-btn {
+    color: #03a9f4;
+    right: .213rem;
+    background: #fff;
+}
+.vodal-dialog{
+  font-size: 0.186rem;
+}
+.rotate2d {
+  animation-name: rotate2d;
+  -webkit-animation-name: rotate2d;
+  animation-iteration-count: infinite;
+}
+.rotate2d-reverse {
+  animation-name: rotate2dReverse;
+  -webkit-animation-name: rotate2dReverse;
+  animation-iteration-count: infinite;
+}
 @keyframes rotate2d {
-  .loop-rotate(10%)
+  .loop-rotate(1%)
+}
+@keyframes rotate2dReverse {
+  .loop-rotate-reverse(1%)
 }
 .loop-rotate(@index) when (@index =< 100){
   @{index} {transform: rotate(unit(@index*360)/100deg);}
-  .loop-rotate(@index + 10)
+  .loop-rotate(@index + 1)
+}
+.loop-rotate-reverse(@index) when (@index =< 100){
+  @{index} {transform: rotate(unit(-@index*360)/100deg);}
+  .loop-rotate-reverse(@index + 1)
 }
 </style>

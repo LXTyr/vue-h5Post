@@ -2,8 +2,37 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>hfive-post</title>
+    <title>十周年</title>
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <script type="text/javascript">
+      var docEl = document.documentElement,dpr;
+      if(window.devicePixelRatio >=2 ){
+        dpr = 2
+      }
+      if(docEl.clientHeight / docEl.clientWidth < 1.4){
+        window.pageWidth = docEl.clientHeight * 375 / 667;
+      }else {
+        window.pageWidth = docEl.clientWidth
+      }
+      var fontSize = window.pageWidth * dpr / 10;
+      console.log(dpr)
+      docEl.style.fontSize = fontSize + 'px';
+
+      window.addEventListener("orientationchange",function(){
+       if(window.orientation == 0) // Portrait
+       {
+        //alert("Portrait");
+        location.reload();
+       }
+       else // Landscape
+       {
+         //alert("Landscape");
+         location.reload();
+       }
+      });
+    </script>
   </head>
   <body>
     <div id="app"></div>

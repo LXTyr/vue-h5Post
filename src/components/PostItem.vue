@@ -17,7 +17,7 @@ export default {
     return {
       style: {
         backgroundColor: this.options.backgroundColor,
-        backgroundImage: this.options.backgroundImageUrl
+        backgroundImage: 'url(\''+this.options.backgroundImage+'\')'
       }
     }
   },
@@ -41,6 +41,7 @@ export default {
 <style lang="css">
 .post-item {
   position: relative;
+  background-size: 100% 100%;
 }
 .post-item.no-swipe:after {
   display: none;
@@ -48,10 +49,10 @@ export default {
 .post-item:after {
   position: absolute;
   left: 47%;
-  bottom: 1em;
+  bottom: .21333333rem;
   content: " ";
-  width: 2em;
-  height: 1.8em;
+  width: .42666667rem;
+  height: .384em;
   background-image: url('../assets/web-swipe-tip.png');
   background-repeat: no-repeat;
   background-size: contain;
@@ -66,11 +67,11 @@ export default {
     opacity: 1;
   }
   50% {
-    transform: translate3d(0,-1em);
+    transform: translate3d(0,-.21333333em);
     opacity: 0.5;
   }
   to {
-    transform: translate3d(0,-2em,0);
+    transform: translate3d(0,-.42666667em,0);
     opacity: 0;
   }
 }
